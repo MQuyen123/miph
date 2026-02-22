@@ -1,0 +1,30 @@
+import 'package:equatable/equatable.dart';
+
+class PaginationModel extends Equatable {
+  final int totalItems;
+  final int totalItemsPerPage;
+  final int currentPage;
+  final int totalPages;
+
+  const PaginationModel({
+    required this.totalItems,
+    required this.totalItemsPerPage,
+    required this.currentPage,
+    required this.totalPages,
+  });
+
+  factory PaginationModel.fromJson(Map<String, dynamic> json) {
+    return PaginationModel(
+      totalItems: json['totalItems'] as int? ?? 0,
+      totalItemsPerPage: json['totalItemsPerPage'] as int? ?? 10,
+      currentPage: json['currentPage'] as int? ?? 1,
+      totalPages: json['totalPages'] as int? ?? 1,
+    );
+  }
+
+  bool get hasNextPage => currentPage < totalPages;
+
+  @override
+  List<Object?> get props =>
+      [totalItems, totalItemsPerPage, currentPage, totalPages];
+}
