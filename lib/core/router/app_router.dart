@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/home/presentation/bloc/home_bloc.dart';
+import '../../features/home/presentation/bloc/home_event.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/movie_detail/presentation/pages/movie_detail_page.dart';
 import '../../features/search/presentation/pages/search_page.dart';
@@ -9,6 +12,7 @@ import '../../features/watch/presentation/pages/watch_page.dart';
 import '../../features/favorite/presentation/pages/favorites_page.dart';
 import '../../features/history/presentation/pages/history_page.dart';
 import '../widgets/main_scaffold.dart';
+import '../../injection_container.dart';
 
 /// App route paths.
 class AppRoutes {
@@ -33,8 +37,12 @@ final GoRouter appRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/',
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: HomePage()),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: BlocProvider(
+              create: (_) => sl<HomeBloc>()..add(const LoadHomeData()),
+              child: const HomePage(),
+            ),
+          ),
         ),
         GoRoute(
           path: '/search',
