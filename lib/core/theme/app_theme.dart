@@ -144,7 +144,6 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: AppColors.backgroundLight,
       cardColor: AppColors.cardLight,
-
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -157,7 +156,6 @@ class AppTheme {
           fontWeight: FontWeight.bold,
         ),
       ),
-
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
         selectedItemColor: AppColors.primary,
@@ -165,14 +163,12 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 8,
       ),
-
       cardTheme: CardThemeData(
         color: AppColors.cardLight,
         elevation: 1,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         clipBehavior: Clip.antiAlias,
       ),
-
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: const Color(0xFFF0F0F0),
@@ -186,7 +182,6 @@ class AppTheme {
           vertical: 14,
         ),
       ),
-
       chipTheme: ChipThemeData(
         backgroundColor: const Color(0xFFF0F0F0),
         selectedColor: AppColors.primary,
@@ -197,7 +192,6 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         side: BorderSide.none,
       ),
-
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
