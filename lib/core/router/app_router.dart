@@ -15,6 +15,8 @@ import '../../features/movie_detail/presentation/bloc/movie_detail_event.dart';
 import '../../features/movie_detail/presentation/pages/movie_detail_page.dart';
 import '../../features/search/presentation/bloc/search_bloc.dart';
 import '../../features/search/presentation/pages/search_page.dart';
+import '../../features/watch/presentation/bloc/watch_bloc.dart';
+import '../../features/watch/presentation/bloc/watch_event.dart';
 import '../../features/watch/presentation/pages/watch_page.dart';
 import '../widgets/main_scaffold.dart';
 import '../../injection_container.dart';
@@ -97,7 +99,11 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) {
         final slug = state.pathParameters['slug']!;
         final episode = state.pathParameters['episode']!;
-        return WatchPage(movieSlug: slug, episodeSlug: episode);
+        return BlocProvider(
+          create: (_) => sl<WatchBloc>()
+            ..add(LoadEpisode(movieSlug: slug, episodeSlug: episode)),
+          child: WatchPage(movieSlug: slug, episodeSlug: episode),
+        );
       },
     ),
   ],
