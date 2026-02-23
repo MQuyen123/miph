@@ -22,6 +22,16 @@ class PaginationModel extends Equatable {
     );
   }
 
+  /// Empty pagination — dùng khi API trả về null
+  factory PaginationModel.empty() {
+    return const PaginationModel(
+      totalItems: 0,
+      totalItemsPerPage: 10,
+      currentPage: 1,
+      totalPages: 1,
+    );
+  }
+
   bool get hasNextPage => currentPage < totalPages;
 
   @override

@@ -39,7 +39,9 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
     } on ServerException {
       rethrow;
     } catch (e) {
-      throw ServerException(message: 'Không thể tải danh sách phim: $e');
+      throw ServerException(
+        message: 'Không thể tải danh sách phim. Vui lòng thử lại sau.',
+      );
     }
   }
 
@@ -64,7 +66,9 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
     } on ServerException {
       rethrow;
     } catch (e) {
-      throw ServerException(message: 'Không thể tải chi tiết phim: $e');
+      throw ServerException(
+        message: 'Không thể tải thông tin phim. Vui lòng thử lại sau.',
+      );
     }
   }
 
@@ -82,26 +86,32 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
 
       if (data['status'] != 'success') {
         throw ServerException(
-          message: data['msg'] as String? ?? 'Lỗi tìm kiếm',
+          message: data['msg'] as String? ?? 'Không tìm thấy kết quả',
         );
       }
 
-      final responseData = data['data'] as Map<String, dynamic>;
+      final responseData = data['data'] as Map<String, dynamic>?;
+      if (responseData == null) {
+        return (<MovieModel>[], PaginationModel.empty());
+      }
 
-      final items = (responseData['items'] as List<dynamic>)
+      final items = (responseData['items'] as List<dynamic>? ?? [])
           .map((e) => MovieModel.fromJson(e as Map<String, dynamic>))
           .toList();
 
-      final params = responseData['params'] as Map<String, dynamic>;
-      final pagination = PaginationModel.fromJson(
-        params['pagination'] as Map<String, dynamic>,
-      );
+      final params = responseData['params'] as Map<String, dynamic>?;
+      final paginationJson = params?['pagination'] as Map<String, dynamic>?;
+      final pagination = paginationJson != null
+          ? PaginationModel.fromJson(paginationJson)
+          : PaginationModel.empty();
 
       return (items, pagination);
     } on ServerException {
       rethrow;
     } catch (e) {
-      throw ServerException(message: 'Không thể tìm kiếm phim: $e');
+      throw ServerException(
+        message: 'Không thể tìm kiếm phim. Vui lòng thử lại sau.',
+      );
     }
   }
 
@@ -133,26 +143,32 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
 
       if (data['status'] != 'success') {
         throw ServerException(
-          message: data['msg'] as String? ?? 'Lỗi tải danh sách phim',
+          message: data['msg'] as String? ?? 'Không thể tải danh sách phim',
         );
       }
 
-      final responseData = data['data'] as Map<String, dynamic>;
+      final responseData = data['data'] as Map<String, dynamic>?;
+      if (responseData == null) {
+        return (<MovieModel>[], PaginationModel.empty());
+      }
 
-      final items = (responseData['items'] as List<dynamic>)
+      final items = (responseData['items'] as List<dynamic>? ?? [])
           .map((e) => MovieModel.fromJson(e as Map<String, dynamic>))
           .toList();
 
-      final params = responseData['params'] as Map<String, dynamic>;
-      final pagination = PaginationModel.fromJson(
-        params['pagination'] as Map<String, dynamic>,
-      );
+      final params = responseData['params'] as Map<String, dynamic>?;
+      final paginationJson = params?['pagination'] as Map<String, dynamic>?;
+      final pagination = paginationJson != null
+          ? PaginationModel.fromJson(paginationJson)
+          : PaginationModel.empty();
 
       return (items, pagination);
     } on ServerException {
       rethrow;
     } catch (e) {
-      throw ServerException(message: 'Không thể tải danh sách phim: $e');
+      throw ServerException(
+        message: 'Không thể tải danh sách phim. Vui lòng thử lại sau.',
+      );
     }
   }
 
@@ -166,7 +182,9 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
           .map((e) => CategoryModel.fromJson(e as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw ServerException(message: 'Không thể tải danh sách thể loại: $e');
+      throw ServerException(
+        message: 'Không thể tải danh sách thể loại. Vui lòng thử lại sau.',
+      );
     }
   }
 
@@ -180,7 +198,9 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
           .map((e) => CountryModel.fromJson(e as Map<String, dynamic>))
           .toList();
     } catch (e) {
-      throw ServerException(message: 'Không thể tải danh sách quốc gia: $e');
+      throw ServerException(
+        message: 'Không thể tải danh sách quốc gia. Vui lòng thử lại sau.',
+      );
     }
   }
 }

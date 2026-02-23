@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/category/presentation/bloc/category_bloc.dart';
+import '../../features/category/presentation/bloc/category_event.dart';
+import '../../features/category/presentation/pages/category_page.dart';
+import '../../features/favorite/presentation/pages/favorites_page.dart';
+import '../../features/history/presentation/pages/history_page.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/home/presentation/bloc/home_event.dart';
 import '../../features/home/presentation/pages/home_page.dart';
+import '../../features/movie_detail/presentation/bloc/movie_detail_bloc.dart';
+import '../../features/movie_detail/presentation/bloc/movie_detail_event.dart';
 import '../../features/movie_detail/presentation/pages/movie_detail_page.dart';
+import '../../features/search/presentation/bloc/search_bloc.dart';
 import '../../features/search/presentation/pages/search_page.dart';
-import '../../features/category/presentation/pages/category_page.dart';
 import '../../features/watch/presentation/pages/watch_page.dart';
-import '../../features/favorite/presentation/pages/favorites_page.dart';
-import '../../features/history/presentation/pages/history_page.dart';
 import '../widgets/main_scaffold.dart';
 import '../../injection_container.dart';
 
@@ -46,14 +51,22 @@ final GoRouter appRouter = GoRouter(
         ),
         GoRoute(
           path: '/search',
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: SearchPage()),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: BlocProvider(
+              create: (_) => sl<SearchBloc>(),
+              child: const SearchPage(),
+            ),
+          ),
         ),
         GoRoute(
           path: '/category/:type',
           builder: (context, state) {
             final type = state.pathParameters['type'] ?? 'phim-bo';
-            return CategoryPage(type: type);
+            return BlocProvider(
+              create: (_) =>
+                  sl<CategoryBloc>()..add(LoadCategoryMovies(type: type)),
+              child: CategoryPage(type: type),
+            );
           },
         ),
         GoRoute(
@@ -73,7 +86,10 @@ final GoRouter appRouter = GoRouter(
       path: '/movie/:slug',
       builder: (context, state) {
         final slug = state.pathParameters['slug']!;
-        return MovieDetailPage(slug: slug);
+        return BlocProvider(
+          create: (_) => sl<MovieDetailBloc>()..add(LoadMovieDetail(slug)),
+          child: MovieDetailPage(slug: slug),
+        );
       },
     ),
     GoRoute(
