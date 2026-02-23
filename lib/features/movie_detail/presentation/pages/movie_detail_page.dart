@@ -4,6 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../favorite/presentation/bloc/favorite_bloc.dart';
+import '../../../favorite/presentation/bloc/favorite_event.dart';
+import '../../../favorite/presentation/bloc/favorite_state.dart';
+import '../../../home/data/models/movie_model.dart';
 import '../../data/models/movie_detail_model.dart';
 import '../bloc/movie_detail_bloc.dart';
 import '../bloc/movie_detail_event.dart';
@@ -79,6 +83,33 @@ class MovieDetailPage extends StatelessWidget {
             expandedHeight: 300,
             pinned: true,
             backgroundColor: AppColors.backgroundDark,
+            actions: [
+              BlocBuilder<FavoriteBloc, FavoriteState>(
+                builder: (context, favState) {
+                  final isFav = favState is FavoriteLoaded &&
+                      favState.isFavorite(movie.slug);
+                  return IconButton(
+                    icon: Icon(
+                      isFav ? Icons.favorite : Icons.favorite_border,
+                      color: isFav ? Colors.red : Colors.white,
+                    ),
+                    onPressed: () {
+                      context.read<FavoriteBloc>().add(
+                            ToggleFavorite(MovieModel(
+                              id: movie.id,
+                              name: movie.name,
+                              slug: movie.slug,
+                              originName: movie.originName,
+                              posterUrl: movie.posterUrl,
+                              thumbUrl: movie.thumbUrl,
+                              year: movie.year,
+                            )),
+                          );
+                    },
+                  );
+                },
+              ),
+            ],
             flexibleSpace: FlexibleSpaceBar(
               background: Stack(
                 fit: StackFit.expand,

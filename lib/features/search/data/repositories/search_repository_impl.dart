@@ -57,6 +57,10 @@ class SearchRepositoryImpl implements SearchRepository {
       return Success(result);
     } on ServerException catch (e) {
       return Failure(message: e.message, statusCode: e.statusCode);
+    } catch (e) {
+      return Failure(
+        message: 'Không thể tải danh sách phim. Vui lòng thử lại sau.',
+      );
     }
   }
 }

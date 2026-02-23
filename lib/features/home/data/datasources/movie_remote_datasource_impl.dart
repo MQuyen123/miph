@@ -141,7 +141,10 @@ class MovieRemoteDataSourceImpl implements MovieRemoteDataSource {
       );
       final data = response.data as Map<String, dynamic>;
 
-      if (data['status'] != 'success') {
+      // API trả về status: true (boolean) hoặc status: 'success' (string)
+      final status = data['status'];
+      final isSuccess = status == true || status == 'success';
+      if (!isSuccess) {
         throw ServerException(
           message: data['msg'] as String? ?? 'Không thể tải danh sách phim',
         );

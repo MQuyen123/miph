@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/widgets/continue_watching_widget.dart';
 import '../../../../core/widgets/movie_card.dart';
 import '../../../../core/widgets/shimmer_loading.dart';
+import '../../../watch/data/models/watch_position_model.dart';
 import '../bloc/home_bloc.dart';
 import '../bloc/home_event.dart';
 import '../bloc/home_state.dart';
@@ -89,6 +91,16 @@ class _HomeContent extends StatelessWidget {
         },
         child: CustomScrollView(
           slivers: [
+            // ── Continue Watching ──
+            SliverToBoxAdapter(
+              child: ContinueWatchingWidget(
+                items: WatchPosition.getAll()
+                    .where((item) => !item.isCompleted)
+                    .take(10)
+                    .toList(),
+              ),
+            ),
+
             // ── Featured Carousel ──
             if (state.featuredMovies.isNotEmpty)
               SliverToBoxAdapter(
@@ -133,8 +145,8 @@ class _HomeContent extends StatelessWidget {
                         children: state.categories.take(12).map((cat) {
                           return ActionChip(
                             label: Text(cat.name),
-                            onPressed: () =>
-                                context.push('/category/${cat.slug}'),
+                            onPressed: () => context
+                                .push('/category/phim-bo?category=${cat.slug}'),
                           );
                         }).toList(),
                       ),

@@ -12,7 +12,6 @@ import '../bloc/watch_bloc.dart';
 import '../bloc/watch_event.dart';
 import '../bloc/watch_state.dart';
 import '../widgets/server_selector.dart';
-import '../widgets/video_controls_overlay.dart';
 
 class WatchPage extends StatefulWidget {
   final String movieSlug;
@@ -151,13 +150,6 @@ class _WatchPageState extends State<WatchPage> {
     }
   }
 
-  void _seekRelative(int seconds) {
-    if (_videoController == null) return;
-    final current = _videoController!.value.position;
-    final target = current + Duration(seconds: seconds);
-    _videoController!.seekTo(target);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -274,17 +266,28 @@ class _WatchPageState extends State<WatchPage> {
           ),
         ),
 
-        // Custom overlay (double-tap zones + lock)
-        Positioned.fill(
-          child: VideoControlsOverlay(
-            isLocked: _isLocked,
-            onDoubleTapLeft: () => _seekRelative(-10),
-            onDoubleTapRight: () => _seekRelative(10),
-            onToggleLock: () => setState(() => _isLocked = !_isLocked),
+        // Lock overlay — chặn tất cả touch khi khóa
+        if (_isLocked)
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => setState(() => _isLocked = false),
+              child: Container(
+                color: Colors.black26,
+                alignment: Alignment.centerLeft,
+                padding: const EdgeInsets.all(16),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.lock, color: Colors.white, size: 24),
+                ),
+              ),
+            ),
           ),
-        ),
 
-        // Back button + lock button
+        // Back button
         if (!_isLocked)
           Positioned(
             top: 4,
@@ -298,16 +301,14 @@ class _WatchPageState extends State<WatchPage> {
             ),
           ),
 
+        // Lock button
         if (!_isLocked)
           Positioned(
             top: 4,
             right: 4,
             child: IconButton(
-              icon: Icon(
-                _isLocked ? Icons.lock : Icons.lock_open,
-                color: Colors.white,
-              ),
-              onPressed: () => setState(() => _isLocked = !_isLocked),
+              icon: const Icon(Icons.lock_open, color: Colors.white),
+              onPressed: () => setState(() => _isLocked = true),
             ),
           ),
       ],

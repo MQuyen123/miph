@@ -5,7 +5,11 @@ import 'package:go_router/go_router.dart';
 import '../../features/category/presentation/bloc/category_bloc.dart';
 import '../../features/category/presentation/bloc/category_event.dart';
 import '../../features/category/presentation/pages/category_page.dart';
+import '../../features/favorite/presentation/bloc/favorite_bloc.dart';
+import '../../features/favorite/presentation/bloc/favorite_event.dart';
 import '../../features/favorite/presentation/pages/favorites_page.dart';
+import '../../features/history/presentation/bloc/history_bloc.dart';
+import '../../features/history/presentation/bloc/history_event.dart';
 import '../../features/history/presentation/pages/history_page.dart';
 import '../../features/home/presentation/bloc/home_bloc.dart';
 import '../../features/home/presentation/bloc/home_event.dart';
@@ -64,22 +68,31 @@ final GoRouter appRouter = GoRouter(
           path: '/category/:type',
           builder: (context, state) {
             final type = state.pathParameters['type'] ?? 'phim-bo';
+            final category = state.uri.queryParameters['category'];
             return BlocProvider(
-              create: (_) =>
-                  sl<CategoryBloc>()..add(LoadCategoryMovies(type: type)),
-              child: CategoryPage(type: type),
+              create: (_) => sl<CategoryBloc>()
+                ..add(LoadCategoryMovies(type: type, category: category)),
+              child: CategoryPage(type: type, initialCategory: category),
             );
           },
         ),
         GoRoute(
           path: '/favorites',
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: FavoritesPage()),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: BlocProvider(
+              create: (_) => sl<FavoriteBloc>()..add(const LoadFavorites()),
+              child: const FavoritesPage(),
+            ),
+          ),
         ),
         GoRoute(
           path: '/history',
-          pageBuilder: (context, state) =>
-              const NoTransitionPage(child: HistoryPage()),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: BlocProvider(
+              create: (_) => sl<HistoryBloc>()..add(const LoadHistory()),
+              child: const HistoryPage(),
+            ),
+          ),
         ),
       ],
     ),
@@ -88,8 +101,15 @@ final GoRouter appRouter = GoRouter(
       path: '/movie/:slug',
       builder: (context, state) {
         final slug = state.pathParameters['slug']!;
-        return BlocProvider(
-          create: (_) => sl<MovieDetailBloc>()..add(LoadMovieDetail(slug)),
+        return MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (_) => sl<MovieDetailBloc>()..add(LoadMovieDetail(slug)),
+            ),
+            BlocProvider(
+              create: (_) => sl<FavoriteBloc>()..add(const LoadFavorites()),
+            ),
+          ],
           child: MovieDetailPage(slug: slug),
         );
       },

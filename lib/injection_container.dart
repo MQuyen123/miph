@@ -21,6 +21,8 @@ import 'features/search/domain/usecases/get_movies_by_type.dart';
 import 'features/search/domain/usecases/search_movies.dart';
 import 'features/search/presentation/bloc/search_bloc.dart';
 import 'features/watch/presentation/bloc/watch_bloc.dart';
+import 'features/favorite/presentation/bloc/favorite_bloc.dart';
+import 'features/history/presentation/bloc/history_bloc.dart';
 
 /// Global service locator instance.
 final sl = GetIt.instance;
@@ -105,4 +107,8 @@ Future<void> initDependencies() async {
   sl.registerFactory(() => WatchBloc(
         getMovieDetail: sl<GetMovieDetail>(),
       ));
+
+  sl.registerFactory(() => FavoriteBloc());
+
+  sl.registerFactory(() => HistoryBloc());
 }
