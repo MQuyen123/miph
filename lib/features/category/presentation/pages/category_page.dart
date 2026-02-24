@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/movie_card.dart';
+import '../../../../core/widgets/shimmer_loading.dart';
 import '../bloc/category_bloc.dart';
 import '../bloc/category_event.dart';
 import '../bloc/category_state.dart';
@@ -194,9 +195,7 @@ class _CategoryPageState extends State<CategoryPage> {
     return BlocBuilder<CategoryBloc, CategoryState>(
       builder: (context, state) {
         if (state is CategoryLoading || state is CategoryInitial) {
-          return const Center(
-            child: CircularProgressIndicator(color: AppColors.primary),
-          );
+          return const CategoryShimmer();
         }
 
         if (state is CategoryError) {
@@ -243,35 +242,44 @@ class _CategoryPageState extends State<CategoryPage> {
   }
 
   Widget _buildGrid(BuildContext context, CategoryLoaded state) {
-    return NotificationListener<ScrollNotification>(
-      onNotification: (notification) {
-        if (notification is ScrollEndNotification &&
-            notification.metrics.pixels >=
-                notification.metrics.maxScrollExtent - 200) {
-          context.read<CategoryBloc>().add(const LoadMoreCategoryMovies());
-        }
-        return false;
-      },
-      child: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3,
-          childAspectRatio: 0.6,
-          crossAxisSpacing: 10,
-          mainAxisSpacing: 10,
-        ),
-        itemCount: state.movies.length + (state.isLoadingMore ? 3 : 0),
-        itemBuilder: (context, index) {
-          if (index >= state.movies.length) {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primary,
-                strokeWidth: 2,
-              ),
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: () async {
+        _loadMovies();
+        await context.read<CategoryBloc>().stream.firstWhere(
+              (s) => s is CategoryLoaded || s is CategoryError,
             );
+      },
+      child: NotificationListener<ScrollNotification>(
+        onNotification: (notification) {
+          if (notification is ScrollEndNotification &&
+              notification.metrics.pixels >=
+                  notification.metrics.maxScrollExtent - 200) {
+            context.read<CategoryBloc>().add(const LoadMoreCategoryMovies());
           }
-          return MovieCard(movie: state.movies[index]);
+          return false;
         },
+        child: GridView.builder(
+          padding: const EdgeInsets.all(16),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            childAspectRatio: 0.6,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
+          ),
+          itemCount: state.movies.length + (state.isLoadingMore ? 3 : 0),
+          itemBuilder: (context, index) {
+            if (index >= state.movies.length) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
+                  strokeWidth: 2,
+                ),
+              );
+            }
+            return MovieCard(movie: state.movies[index]);
+          },
+        ),
       ),
     );
   }

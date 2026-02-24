@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../favorite/presentation/bloc/favorite_bloc.dart';
@@ -42,9 +43,66 @@ class MovieDetailPage extends StatelessWidget {
 
   Widget _buildLoadingScaffold(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: const Center(
-        child: CircularProgressIndicator(color: AppColors.primary),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 300,
+            pinned: true,
+            backgroundColor: AppColors.backgroundDark,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Hero(
+                tag: 'movie-poster-$slug',
+                child: Container(color: AppColors.cardDark),
+              ),
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Shimmer.fromColors(
+              baseColor: AppColors.shimmerBase,
+              highlightColor: AppColors.shimmerHighlight,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                        height: 24, width: 200, color: AppColors.shimmerBase),
+                    const SizedBox(height: 12),
+                    Container(
+                        height: 16, width: 160, color: AppColors.shimmerBase),
+                    const SizedBox(height: 16),
+                    Row(
+                        children: List.generate(
+                            4,
+                            (_) => Container(
+                                  height: 28,
+                                  width: 60,
+                                  margin: const EdgeInsets.only(right: 8),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.shimmerBase,
+                                    borderRadius: BorderRadius.circular(14),
+                                  ),
+                                ))),
+                    const SizedBox(height: 24),
+                    Container(
+                        height: 48,
+                        width: double.infinity,
+                        color: AppColors.shimmerBase),
+                    const SizedBox(height: 24),
+                    ...List.generate(
+                        5,
+                        (_) => Container(
+                              height: 14,
+                              width: double.infinity,
+                              margin: const EdgeInsets.only(bottom: 8),
+                              color: AppColors.shimmerBase,
+                            )),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -114,13 +172,16 @@ class MovieDetailPage extends StatelessWidget {
               background: Stack(
                 fit: StackFit.expand,
                 children: [
-                  CachedNetworkImage(
-                    imageUrl: movie.thumbUrl.isNotEmpty
-                        ? movie.thumbUrl
-                        : movie.posterUrl,
-                    fit: BoxFit.cover,
-                    errorWidget: (_, __, ___) =>
-                        Container(color: AppColors.cardDark),
+                  Hero(
+                    tag: 'movie-poster-${movie.slug}',
+                    child: CachedNetworkImage(
+                      imageUrl: movie.thumbUrl.isNotEmpty
+                          ? movie.thumbUrl
+                          : movie.posterUrl,
+                      fit: BoxFit.cover,
+                      errorWidget: (_, __, ___) =>
+                          Container(color: AppColors.cardDark),
+                    ),
                   ),
                   // Gradient overlay
                   Container(
